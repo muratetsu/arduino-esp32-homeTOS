@@ -7,10 +7,7 @@
 #include <Preferences.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
-#include <Adafruit_NeoPixel.h>
-
-#define PIN         10
-#define NUMPIXELS   1
+#include "LedControl.h"
 
 // MQTT Broker
 const char *mqtt_broker = "broker.emqx.io";
@@ -30,8 +27,6 @@ const int PushSw = 9; // Boot Switch
 WiFiClient espClient;
 PubSubClient client(espClient);
 Preferences prefs;
-Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
-
 
 //*******************************************************
 // WiFi
@@ -229,10 +224,15 @@ void setup()
 {
   pinMode(PushSw, INPUT);
   Serial.begin(115200);
-  pixels.begin();
+  ledCtrlInit();
+  ledCtrlSetPixel(LED_RED);
+
 //  wifiDumpSsidAndPassword();
   wifiConnect();
   mqttConnect();
+
+  ledCtrlSetPixel(LED_OFF);
+  ledCtrlStartTimer();
 }
 
 void loop()
@@ -249,8 +249,8 @@ void loop()
     client.publish(topicLocalEvent, buf);
     Serial.println(buf);
 
-    pixels.setPixelColor(0, pixels.Color(0, 150, 0));
-    pixels.show();
+    // pixels.setPixelColor(0, pixels.Color(0, 150, 0));
+    // pixels.show();
   }
   swLastState = swState;
 }
