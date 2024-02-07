@@ -225,14 +225,13 @@ void setup()
   pinMode(PushSw, INPUT);
   Serial.begin(115200);
   ledCtrlInit();
-  ledCtrlSetPixel(LED_RED);
+  ledCtrlSetPixel(1000, 128, 0, 0);
 
 //  wifiDumpSsidAndPassword();
   wifiConnect();
   mqttConnect();
 
-  ledCtrlSetPixel(LED_OFF);
-  ledCtrlStartTimer();
+  ledCtrlSetPixel(0, 128, 0, 0);
 }
 
 void loop()
@@ -248,9 +247,7 @@ void loop()
     sprintf(buf, "Pushed %d", count++);
     client.publish(topicLocalEvent, buf);
     Serial.println(buf);
-
-    // pixels.setPixelColor(0, pixels.Color(0, 150, 0));
-    // pixels.show();
+    ledCtrlSetPixel(100, 0, 128, 128);
   }
   swLastState = swState;
 }
