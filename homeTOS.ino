@@ -23,6 +23,7 @@ String local_id;
 String remote_id;
 
 const int PushSw = 9; // Boot Switch
+static pixel_state_t pixelState;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -224,14 +225,21 @@ void setup()
 {
   pinMode(PushSw, INPUT);
   Serial.begin(115200);
+
   ledCtrlInit();
-  ledCtrlSetPixel(1000, 128, 0, 0);
+
+  pixelState.dulation = 1000;
+  pixelState.red = 128;
+  pixelState.green = 0;
+  pixelState.blue = 0;
+  ledCtrlSetPixel(pixelState);
 
 //  wifiDumpSsidAndPassword();
   wifiConnect();
   mqttConnect();
 
-  ledCtrlSetPixel(0, 128, 0, 0);
+  pixelState.dulation = 0;
+  ledCtrlSetPixel(pixelState);
 }
 
 void loop()
@@ -247,7 +255,12 @@ void loop()
     sprintf(buf, "Pushed %d", count++);
     client.publish(topicLocalEvent, buf);
     Serial.println(buf);
-    ledCtrlSetPixel(100, 0, 128, 128);
+
+    pixelState.dulation = 100;
+    pixelState.red = random(256);
+    pixelState.green = random(256);
+    pixelState.blue = random(256);
+    ledCtrlSetPixel(pixelState);
   }
   swLastState = swState;
 }

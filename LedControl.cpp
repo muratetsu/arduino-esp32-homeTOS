@@ -10,16 +10,9 @@
 #define PIN         10
 #define NUMPIXELS   1
 
-typedef struct {
-  int dulation;
-  uint8_t red;
-  uint8_t green;
-  uint8_t blue;
-} pixel_state_t;
-
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 Ticker ticker;
-pixel_state_t pixelState;
+static pixel_state_t pixelState;
 
 void timerHandler(void)
 {
@@ -47,13 +40,13 @@ void ledCtrlInit(void)
   ticker.attach_ms(10, timerHandler);
 }
 
-void ledCtrlSetPixel(int dulation, uint8_t red, uint8_t green, uint8_t blue)
+void ledCtrlSetPixel(pixel_state_t px)
 {
-  pixelState.dulation = dulation;
-  pixelState.red      = red;
-  pixelState.green    = green;
-  pixelState.blue     = blue;  
+  pixelState.dulation = px.dulation;
+  pixelState.red      = px.red;
+  pixelState.green    = px.green;
+  pixelState.blue     = px.blue;
 
-  pixels.setPixelColor(0, red, green, blue);
+  pixels.setPixelColor(0, px.red, px.green, px.blue);
   pixels.show();
 }
