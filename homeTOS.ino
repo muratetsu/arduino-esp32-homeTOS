@@ -8,6 +8,7 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include "LedControl.h"
+#include "Sensor.h"
 
 // MQTT Broker
 const char *mqtt_broker = "broker.emqx.io";
@@ -240,6 +241,8 @@ void setup()
 
   pixelState.dulation = 0;
   ledCtrlSetPixel(pixelState);
+
+  sensorInit();
 }
 
 void loop()

@@ -3,18 +3,19 @@
 // February 4, 2024
 // Tetsu Nishimura
 
+#include <Arduino.h>
 #include <Ticker.h>
 #include <Adafruit_NeoPixel.h>
 #include "LedControl.h"
 
-#define PIN         10
-#define NUMPIXELS   1
+#define PIXEL_PIN   10
+#define NUM_PIXELS   1
 
-Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
-Ticker ticker;
+Ticker ledTicker;
+Adafruit_NeoPixel pixels(NUM_PIXELS, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 static pixel_state_t pixelState;
 
-void timerHandler(void)
+void ledTimerHandler(void)
 {
   if (pixelState.dulation > 0) {
     pixelState.dulation--;
@@ -37,7 +38,7 @@ void timerHandler(void)
 void ledCtrlInit(void)
 {
   pixels.begin();
-  ticker.attach_ms(10, timerHandler);
+  ledTicker.attach_ms(10, ledTimerHandler);
 }
 
 void ledCtrlSetPixel(pixel_state_t px)
