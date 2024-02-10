@@ -21,16 +21,10 @@ void ledTimerHandler(void)
     pixelState.dulation--;
   }
   else {
-    if (pixelState.red > 0) {
-      pixelState.red--;
+    if (pixelState.val > 0) {
+      pixelState.val--;
     }
-    if (pixelState.green > 0) {
-      pixelState.green--;
-    }
-    if (pixelState.blue > 0) {
-      pixelState.blue--;
-    }
-    pixels.setPixelColor(0, pixelState.red, pixelState.green, pixelState.blue);
+    pixels.setPixelColor(0, pixels.ColorHSV(pixelState.hue, pixelState.sat, pixelState.val));
     pixels.show();
   }
 }
@@ -44,10 +38,10 @@ void ledCtrlInit(void)
 void ledCtrlSetPixel(pixel_state_t px)
 {
   pixelState.dulation = px.dulation;
-  pixelState.red      = px.red;
-  pixelState.green    = px.green;
-  pixelState.blue     = px.blue;
+  pixelState.hue      = px.hue;
+  pixelState.sat      = px.sat;
+  pixelState.val      = px.val;
 
-  pixels.setPixelColor(0, px.red, px.green, px.blue);
+  pixels.setPixelColor(0, pixels.ColorHSV(px.hue, px.sat, px.val));
   pixels.show();
 }

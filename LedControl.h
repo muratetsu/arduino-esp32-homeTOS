@@ -6,10 +6,10 @@
 #define LED_CONTROL_H
 
 typedef struct {
-  int dulation;
-  uint8_t red;
-  uint8_t green;
-  uint8_t blue;
+  uint16_t dulation;
+  uint16_t hue;
+  uint8_t sat;
+  uint8_t val;
 } pixel_state_t;
 
 void ledCtrlInit(void);

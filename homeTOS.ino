@@ -7,6 +7,7 @@
 #include <Preferences.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
+#include <stdlib.h>
 #include "LedControl.h"
 #include "Sensor.h"
 
@@ -191,6 +192,11 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
   else if (strcmp(topic, topicRemoteEvent) == 0) {
     Serial.println("Remote event received");
     // ここでLEDの制御を行う
+    if (strncmp((char*)payload, "BTN:", 4) == 0) {
+      pixel_state_t px;
+      pixelDecode(payload, length, &px);
+      ledCtrlSetPixel(px);
+    }
   }
 }
 
@@ -230,9 +236,9 @@ void setup()
   ledCtrlInit();
 
   pixelState.dulation = 1000;
-  pixelState.red = 128;
-  pixelState.green = 0;
-  pixelState.blue = 0;
+  pixelState.hue = 0;
+  pixelState.sat = 255;
+  pixelState.val = 128;
   ledCtrlSetPixel(pixelState);
 
 //  wifiDumpSsidAndPassword();
@@ -242,12 +248,11 @@ void setup()
   pixelState.dulation = 0;
   ledCtrlSetPixel(pixelState);
 
-  sensorInit();
+  // sensorInit();
 }
 
 void loop()
 {
-  static int count = 0;
   static int swLastState = 1;
   char buf[20];
 
@@ -255,15 +260,36 @@ void loop()
 
   int swState = digitalRead(PushSw);
   if (swLastState == 1 && swState == 0) {
-    sprintf(buf, "Pushed %d", count++);
+    pixelState.dulation = 100;
+    pixelState.hue = random(65536);
+    pixelState.sat = 128 + random(128);
+    pixelState.val = 128;
+    ledCtrlSetPixel(pixelState);
+
+    pixelEncode(buf, pixelState);
     client.publish(topicLocalEvent, buf);
     Serial.println(buf);
-
-    pixelState.dulation = 100;
-    pixelState.red = random(256);
-    pixelState.green = random(256);
-    pixelState.blue = random(256);
-    ledCtrlSetPixel(pixelState);
   }
   swLastState = swState;
+}
+
+void pixelEncode(char* buf, pixel_state_t px)
+{
+    sprintf(buf, "BTN:%04X%04X%02X%02X",
+      px.dulation, px.hue, px.sat, px.val);
+}
+
+void pixelDecode(const byte* payload, int len, pixel_state_t* px)
+{
+  char buf[20] = {0};
+  long long val;
+
+  memcpy(buf, payload, len);
+  Serial.println(buf);
+  val = strtoll(&buf[4], NULL, 16);
+
+  px->dulation = (val >> 32) & 0xffff;
+  px->hue      = (val >> 16) & 0xffff;
+  px->sat      = (val >>  8) & 0xff;
+  px->val      =  val        & 0xff;
 }
