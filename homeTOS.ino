@@ -191,7 +191,6 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
   
   else if (strcmp(topic, topicRemoteEvent) == 0) {
     Serial.println("Remote event received");
-    // ここでLEDの制御を行う
     if (strncmp((char*)payload, "BTN:", 4) == 0) {
       pixel_state_t px;
       pixelDecode(payload, length, &px);
@@ -235,7 +234,7 @@ void setup()
 
   ledCtrlInit();
 
-  pixelState.dulation = 1000;
+  pixelState.dulation = 0xffff;
   pixelState.hue = 0;
   pixelState.sat = 255;
   pixelState.val = 128;
@@ -260,7 +259,7 @@ void loop()
 
   int swState = digitalRead(PushSw);
   if (swLastState == 1 && swState == 0) {
-    pixelState.dulation = 100;
+    pixelState.dulation = 2000;
     pixelState.hue = random(65536);
     pixelState.sat = 128 + random(128);
     pixelState.val = 128;
