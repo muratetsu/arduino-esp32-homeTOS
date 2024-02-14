@@ -30,6 +30,7 @@ static pixel_state_t pixelState;
 WiFiClient espClient;
 PubSubClient client(espClient);
 Preferences prefs;
+volatile bool buttonState;
 
 //*******************************************************
 // WiFi
@@ -248,17 +249,17 @@ void setup()
   ledCtrlSetPixel(pixelState);
 
   // sensorInit();
+  attachInterrupt(PushSw, buttonHandler, RISING);
 }
 
 void loop()
 {
-  static int swLastState = 1;
   char buf[20];
 
   client.loop();
 
-  int swState = digitalRead(PushSw);
-  if (swLastState == 1 && swState == 0) {
+  if (buttonState) {
+    buttonState = false;
     pixelState.dulation = 2000;
     pixelState.hue = random(65536);
     pixelState.sat = 128 + random(128);
@@ -269,7 +270,11 @@ void loop()
     client.publish(topicLocalEvent, buf);
     Serial.println(buf);
   }
-  swLastState = swState;
+}
+
+void ARDUINO_ISR_ATTR buttonHandler(void)
+{
+  buttonState = true;
 }
 
 void pixelEncode(char* buf, pixel_state_t px)
