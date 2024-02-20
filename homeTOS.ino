@@ -4,12 +4,15 @@
 // February 3, 2024
 // Tetsu Nishimura
 
+#include <Ticker.h>
 #include <Preferences.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <stdlib.h>
 #include "LedControl.h"
 #include "Sensor.h"
+
+#define SW_LONG_PUSH_DURATION   10 // sec
 
 // MQTT Broker
 const char *mqtt_broker = "broker.emqx.io";
@@ -24,13 +27,15 @@ char topicRemoteEvent[64]; // topic to subscribe remote event
 String local_id;
 String remote_id;
 
-const int PushSw = 9; // Boot Switch
+const int swPin = 9; // Boot Switch
 static pixel_state_t pixelState;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 Preferences prefs;
-volatile bool buttonState;
+volatile bool swState;
+volatile bool swLongPushed;
+Ticker swTicker;
 
 //*******************************************************
 // WiFi
@@ -50,29 +55,30 @@ void wifiDumpSsidAndPassword(void)
   Serial.printf("sta.pswd: %s\n", wifi_key);
 }
 
+bool wifiIsSsidStored(void)
+{
+  bool ret = true;
+  size_t ssidLen, pswdLen;
+
+  prefs.begin("nvs.net80211", true);
+  ssidLen = prefs.getBytesLength("sta.ssid");
+  pswdLen = prefs.getBytesLength("sta.ssid");
+  prefs.end();
+
+  if (ssidLen == 0 || pswdLen == 0) {
+    ret = false;
+  }
+
+  return ret;
+}
+
 // Establish WiFi connection
-//
-// TODO:
-// 今はWiFi APに一定時間接続できなかったらSmartConfigを実行するようにしているが，
-// APの調子が悪かったから繋がらなかっただけで新しいAPの設定をしたいわけではない，みたいな状況はありそう．
-// ボタンの長押しなど，ユーザの明確な意思表示があったときだけSmartConfigを実行するようにすべきかも．
-// Bootボタン長押しで，SSID削除→SmartConfig起動，としてみる？
 bool wifiConnect(void)
 {
   unsigned long tm;
   
-  // 前回接続時の情報で接続する
-  Serial.print("Connecting to WiFi AP");
-  WiFi.begin();
-  tm = millis();
-  while (WiFi.status() != WL_CONNECTED && millis() - tm < 10000) {
-    Serial.print(".");
-    delay(500);
-  }
-  Serial.println("");
-
-  // If WiFi connection failed, start SmartConfig
-  if (WiFi.status() != WL_CONNECTED) {
+  if (!wifiIsSsidStored()) {
+    Serial.print("No SSID stored");
     //Init WiFi as Station, start SmartConfig
     WiFi.mode(WIFI_AP_STA);
     WiFi.beginSmartConfig();
@@ -84,7 +90,7 @@ bool wifiConnect(void)
       delay(500);
       Serial.print(".");
 
-      // 5分以上SmartConfigによる設定がされなかったら抜ける(発熱の懸念があるので)
+      // 5分以上SmartConfigによる設定がされなかったら抜ける
       if (millis() - tm > 300000) {
         Serial.println("");
         Serial.println("Timeout");
@@ -93,20 +99,16 @@ bool wifiConnect(void)
     }
     Serial.println("");
     Serial.println("SmartConfig received.");
-  
-    //Wait for WiFi to connect to AP
-    Serial.print("Connectiong to WiFi AP");
-    tm = millis();
-    while (WiFi.status() != WL_CONNECTED) {
-      delay(500);
-      Serial.print(".");
-      // 繋がるはずだけど，10秒以上繋がらなかったら念の為リセットする
-      if (millis() - tm > 10000) {
-        Serial.println("");
-        Serial.println("Timeout. Restart ESP32.");
-        ESP.restart();
-      }
-    }  
+  }
+  else {
+    // 前回接続時の情報で接続する
+    WiFi.begin();
+  }
+
+  //Wait for WiFi to connect to AP
+  Serial.print("Connectiong to WiFi AP");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
   }
   
   Serial.println("Connection established.");
@@ -230,7 +232,7 @@ void mqttReplaceRemoteId(byte *payload, int length)
 
 void setup()
 {
-  pinMode(PushSw, INPUT);
+  pinMode(swPin, INPUT);
   Serial.begin(115200);
 
   ledCtrlInit();
@@ -241,15 +243,16 @@ void setup()
   pixelState.val = 128;
   ledCtrlSetPixel(pixelState);
 
-//  wifiDumpSsidAndPassword();
-  wifiConnect();
+  attachInterrupt(swPin, swHandler, CHANGE);
+
+  // wifiDumpSsidAndPassword();
+  wifiConnect();  // TODO: SmartConfigに失敗するとFalseを返すので対処を考えること
   mqttConnect();
 
   pixelState.dulation = 0;
   ledCtrlSetPixel(pixelState);
 
   // sensorInit();
-  attachInterrupt(PushSw, buttonHandler, RISING);
 }
 
 void loop()
@@ -258,8 +261,8 @@ void loop()
 
   client.loop();
 
-  if (buttonState) {
-    buttonState = false;
+  if (swState) {
+    swState = false;
     pixelState.dulation = 2000;
     pixelState.hue = random(65536);
     pixelState.sat = 128 + random(128);
@@ -272,9 +275,37 @@ void loop()
   }
 }
 
-void ARDUINO_ISR_ATTR buttonHandler(void)
+void ARDUINO_ISR_ATTR swHandler(void)
 {
-  buttonState = true;
+  if (digitalRead(swPin) == LOW) {
+    swState = true;
+    swLongPushed = false;
+    swTicker.attach(SW_LONG_PUSH_DURATION, swLongPushHandler);
+  }
+  else {
+    swTicker.detach();
+    if (swLongPushed) {
+      ESP.restart();
+    }
+  }
+}
+
+void swLongPushHandler(void)
+{
+  swLongPushed = true;
+  Serial.println("Erase SSID");
+
+  prefs.begin("nvs.net80211", false);
+  prefs.clear();
+  prefs.end();
+
+  // Let user know that SSID is erased
+  // TODO: 高速点滅など分かりやすいです表示に変えること
+  pixelState.dulation = 2000;
+  pixelState.hue = 0;
+  pixelState.sat = 255;
+  pixelState.val = 128;
+  ledCtrlSetPixel(pixelState);
 }
 
 void pixelEncode(char* buf, pixel_state_t px)
