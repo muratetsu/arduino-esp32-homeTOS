@@ -1,7 +1,7 @@
 # arduino-esp32-homeTOS
 The project "Home The Other Side"
 
-## ハードウェア仕様
+## Hardware
 
 ### Features
 
@@ -16,7 +16,7 @@ The project "Home The Other Side"
 | GPIO | Arduino | Description |
 | --- | --- | --- |
 | GPIO2 | D0/A0 | NC  |
-| GPIO3 | D1/A1 | 照度センサ |
+| GPIO3 | D1/A1 | Light Sensor |
 | GPIO4 | D2/A2 | LED |
 | GPIO5 | D3/A3 | LED |
 | GPIO6 | D4  | LED |
@@ -24,16 +24,16 @@ The project "Home The Other Side"
 | GPIO21 | D6  | NC  |
 | GPIO20 | D7  | LED |
 | GPIO8 | D8  | NC  |
-| GPIO9 | D9  | スイッチ入力 |
-| GPIO10 | D10 | フルカラーシリアルLED |
+| GPIO9 | D9  | Switch Input |
+| GPIO10 | D10 | Full Color Digital LED |
   
 ### Schematics
 
 ![Schematics](schematics.png)
 
-## ソフトウェア仕様
+## Software
 
-### 開発環境
+### Development Environment
 
 -  Arduino IDE Version 2.2.1
 
