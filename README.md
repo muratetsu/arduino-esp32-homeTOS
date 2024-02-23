@@ -44,4 +44,5 @@ The project "Home The Other Side"
 ### Library Manager
 
 - PubSubClient 2.8
+- EspMQTTClient 1.13.3
 - Adafruit NeoPixel 1.12.0
