@@ -159,14 +159,17 @@ void mqttInit(void)
 void onConnectionEstablished()
 {
   // Subscribe topics
-  client.subscribe(topicRemoteEvent, remoteEventCB);
-  client.subscribe(topicConfig, configCB);
+  client.subscribe(topicRemoteEvent, onRemoteEvent);
+  client.subscribe(topicConfig, onHostConfig);
 
   // Publish state message
   mqttPublishState();
+
+  // Turn off Digital LED
+  ledCtrlSetPixelOff();
 }
 
-void remoteEventCB(const String& msg)
+void onRemoteEvent(const String& msg)
 {
   Serial.println("Remote event received");
 
@@ -185,7 +188,7 @@ void remoteEventCB(const String& msg)
   }
 }
 
-void configCB(const String& msg)
+void onHostConfig(const String& msg)
 {
   Serial.println("Configuration data received");
 
@@ -200,7 +203,7 @@ void configCB(const String& msg)
 
       client.unsubscribe(topicRemoteEvent);      
       generateTopic(topicRemoteEvent, remote_id.c_str(), "event");
-      client.subscribe(topicRemoteEvent, remoteEventCB);
+      client.subscribe(topicRemoteEvent, onRemoteEvent);
       
       mqttPublishState();
     }
@@ -237,20 +240,15 @@ void setup()
   Serial.begin(115200);
 
   ledCtrlInit();
-
-  pixelState.dulation = 0xffff;
-  pixelState.hue = 0;
-  pixelState.sat = 255;
-  pixelState.val = 128;
-  ledCtrlSetPixel(pixelState);
+  ledCtrlSetPixelRed();
+  ledCtrlSetStreetLight(255);
+  ledCtrlSetEntranceLight(255);
+  ledCtrlSetRoomLight(255);
 
   attachInterrupt(PIN_SWITCH, swHandler, CHANGE);
 
   wifiSetup();
   mqttInit();
-
-  pixelState.dulation = 0;
-  ledCtrlSetPixel(pixelState);
 
   // sensorInit();
 }
