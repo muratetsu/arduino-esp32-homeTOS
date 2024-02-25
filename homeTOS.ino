@@ -11,6 +11,7 @@
 #include "LedControl.h"
 #include "Sensor.h"
 
+#define PIN_SWITCH              D9
 #define SW_LONG_PUSH_DURATION   10 // sec
 
 typedef struct {
@@ -45,7 +46,6 @@ char topicRemoteEvent[64]; // topic to subscribe remote event
 String local_id;
 String remote_id;
 
-const int swPin = 9; // Boot Switch
 static pixel_state_t pixelState;
 
 EspMQTTClient client;          // using the default constructor
@@ -233,7 +233,7 @@ void mqttPublishState(void)
 
 void setup()
 {
-  pinMode(swPin, INPUT);
+  pinMode(PIN_SWITCH, INPUT);
   Serial.begin(115200);
 
   ledCtrlInit();
@@ -244,7 +244,7 @@ void setup()
   pixelState.val = 128;
   ledCtrlSetPixel(pixelState);
 
-  attachInterrupt(swPin, swHandler, CHANGE);
+  attachInterrupt(PIN_SWITCH, swHandler, CHANGE);
 
   wifiSetup();
   mqttInit();
@@ -277,7 +277,7 @@ void loop()
 
 void ARDUINO_ISR_ATTR swHandler(void)
 {
-  if (digitalRead(swPin) == LOW) {
+  if (digitalRead(PIN_SWITCH) == LOW) {
     swState = true;
     swLongPushed = false;
     swTicker.attach(SW_LONG_PUSH_DURATION, swLongPushHandler);

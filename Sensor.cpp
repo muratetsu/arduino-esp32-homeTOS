@@ -6,14 +6,15 @@
 #include <Arduino.h>
 #include <Ticker.h>
 
+#define PIN_LIGHT_SENSOR  A1
+
 Ticker sensorTicker;
-const int sensorPin = A1;
 
 void sensorTimerHandler(void)
 {
   int val;
 
-  val = analogRead(sensorPin);
+  val = analogRead(PIN_LIGHT_SENSOR);
   Serial.println(val);
 }
 
