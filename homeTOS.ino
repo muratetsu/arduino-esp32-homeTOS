@@ -6,6 +6,7 @@
 
 #include <stdlib.h>
 #include <Ticker.h>
+#include <time.h>
 #include "Mqtt.h"
 #include "LedControl.h"
 #include "Sensor.h"
@@ -80,6 +81,8 @@ void loop()
     pixelEncode(buf, pixelState);
     mqttPublishEvent(buf);
     Serial.println(buf);
+
+    printLocalTime();
   }
 }
 
@@ -118,4 +121,16 @@ void pixelEncode(char* buf, pixel_state_t px)
 {
     sprintf(buf, "BTN:%04X%04X%02X%02X",
       px.dulation, px.hue, px.sat, px.val);
+}
+
+void printLocalTime()
+{
+  time_t t;
+  struct tm *tm;
+  char str[256];
+
+  t = time(NULL);
+  tm = localtime(&t);
+  sprintf(str, "[time localtime] %04d/%02d/%02d %02d:%02d:%02d", tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
+  Serial.println(str);
 }

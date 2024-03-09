@@ -5,8 +5,11 @@
 
 #include <Arduino.h>
 #include <Preferences.h>
+#include <time.h>
 #include "Mqtt.h"
 #include "LedControl.h"
+
+#define JST                     (3600 * 9)
 
 // Function prototype
 bool wifiIsSsidStored(void);
@@ -162,6 +165,9 @@ void onConnectionEstablished()
   // Publish state message
   publishState();
 
+  // Get time from NTP server
+  configTime( JST, 0, "ntp.nict.jp", "time.google.com", "ntp.jst.mfeed.ad.jp");
+  
   // Turn off Digital LED
   ledCtrlSetPixelOff();
 }
