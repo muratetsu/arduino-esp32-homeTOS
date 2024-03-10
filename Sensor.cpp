@@ -5,20 +5,51 @@
 
 #include <Arduino.h>
 #include <Ticker.h>
+#include "Sensor.h"
+#include "daytime.h"
 
-#define PIN_LIGHT_SENSOR  A1
+#define PIN_BRIGHTNESS_SENSOR A1
+#define BRIGHTNESS_HIGH       150
+#define BRIGHTNESS_LOW        80
 
-Ticker sensorTicker;
+Ticker eventMonitorTicker;
+stateChangedCallback callback;
+uint16_t currentState;
 
-void sensorTimerHandler(void)
+void eventMonitorTimerHandler(void)
 {
-  int val;
+  int brightness = analogRead(PIN_BRIGHTNESS_SENSOR);
+  bool daytime = isDaytime();
+  
+  if (currentState & STATE_BRIGHT) {
+    if (brightness < BRIGHTNESS_LOW) {
+      currentState &= ~STATE_BRIGHT;
+      callback(currentState);
+    }
+  }
+  else {
+    if (brightness > BRIGHTNESS_HIGH) {
+      currentState |= STATE_BRIGHT;
+      callback(currentState);
+    }
+  }
 
-  val = analogRead(PIN_LIGHT_SENSOR);
-  Serial.println(val);
+  if (currentState & STATE_DAYTIME) {
+    if (!daytime) {
+      currentState &= ~STATE_DAYTIME;
+      callback(currentState);
+    }
+  }
+  else {
+    if (daytime) {
+      currentState |= STATE_DAYTIME;
+      callback(currentState);
+    }
+  }
 }
 
-void sensorInit(void)
+void eventMonitorInit(stateChangedCallback cb)
 {
-  sensorTicker.attach_ms(1000, sensorTimerHandler);
+  callback = cb;
+  eventMonitorTicker.attach_ms(1000, eventMonitorTimerHandler);
 }

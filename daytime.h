@@ -5,6 +5,6 @@
 #ifndef DAYTIME_H
 #define DAYTIME_H
 
-bool daytime(void);
+bool isDaytime(void);
 
 #endif  // DAYTIME_H

@@ -382,7 +382,7 @@ const daytime_t annualDaytime[] = {
 	{423, 1018},
 };
 
-bool daytime(void)
+bool isDaytime(void)
 {
   bool ret;
 

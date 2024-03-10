@@ -10,7 +10,6 @@
 #include "Mqtt.h"
 #include "LedControl.h"
 #include "Sensor.h"
-#include "daytime.h"
 
 #define PIN_SWITCH              D9
 #define SW_LONG_PUSH_DURATION   10 // sec
@@ -22,7 +21,7 @@ volatile bool swLongPushed;
 Ticker swTicker;
 
 //*******************************************************
-// Network
+// Event Handling
 
 void onRemoteEvent(const String& msg)
 {
@@ -40,6 +39,25 @@ void onRemoteEvent(const String& msg)
     px.sat      = (val >>  8) & 0xff;
     px.val      =  val        & 0xff;
     ledCtrlSetPixel(px);
+  }
+}
+
+void onLocalEvent(uint16_t state)
+{
+  printLocalTime();
+
+  if (state & STATE_BRIGHT) {
+    Serial.print("Bright - ");
+  }
+  else {
+    Serial.print("Dark - ");
+  }
+
+  if (state & STATE_DAYTIME) {
+    Serial.println("Daytime");
+  }
+  else {
+    Serial.println("Nighttime");
   }
 }
 
@@ -62,7 +80,7 @@ void setup()
   mqttWifiSetup();
   mqttInit(onRemoteEvent);
 
-  // sensorInit();
+  eventMonitorInit(onLocalEvent);
 }
 
 void loop()
@@ -84,12 +102,6 @@ void loop()
     Serial.println(buf);
 
     printLocalTime();
-    if (daytime()) {
-      Serial.println("Daytime");
-    }
-    else {
-      Serial.println("Nighttime");
-    }
   }
 }
 
