@@ -66,7 +66,7 @@ void ledTimerHandler(void)
   if (val.room < targetVal.room) {
     analogWrite(PIN_ROOM_LIGHT, ++val.room);
   }
-  else if (val.room > targetVal.street) {
+  else if (val.room > targetVal.room) {
     analogWrite(PIN_ROOM_LIGHT, --val.room);
   }
 }
