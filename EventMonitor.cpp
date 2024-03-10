@@ -1,11 +1,11 @@
-// Brightness Sensor
+// Event Monitor
 //
 // February 9, 2024
 // Tetsu Nishimura
 
 #include <Arduino.h>
 #include <Ticker.h>
-#include "Sensor.h"
+#include "EventMonitor.h"
 #include "daytime.h"
 
 #define PIN_BRIGHTNESS_SENSOR A1

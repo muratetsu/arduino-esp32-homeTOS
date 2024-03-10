@@ -9,7 +9,7 @@
 #include <time.h>
 #include "Mqtt.h"
 #include "LedControl.h"
-#include "Sensor.h"
+#include "EventMonitor.h"
 
 #define PIN_SWITCH              D9
 #define SW_LONG_PUSH_DURATION   10 // sec
@@ -46,18 +46,18 @@ void onLocalEvent(uint16_t state)
 {
   printLocalTime();
 
-  if (state & STATE_BRIGHT) {
-    Serial.print("Bright - ");
+  if (state & STATE_DAYTIME) {
+    Serial.print("Daytime - ");
   }
   else {
-    Serial.print("Dark - ");
+    Serial.print("Nighttime - ");
   }
 
-  if (state & STATE_DAYTIME) {
-    Serial.println("Daytime");
+  if (state & STATE_BRIGHT) {
+    Serial.println("Bright");
   }
   else {
-    Serial.println("Nighttime");
+    Serial.println("Dark");
   }
 }
 
