@@ -10,6 +10,7 @@
 #include "Mqtt.h"
 #include "LedControl.h"
 #include "Sensor.h"
+#include "daytime.h"
 
 #define PIN_SWITCH              D9
 #define SW_LONG_PUSH_DURATION   10 // sec
@@ -83,6 +84,12 @@ void loop()
     Serial.println(buf);
 
     printLocalTime();
+    if (daytime()) {
+      Serial.println("Daytime");
+    }
+    else {
+      Serial.println("Nighttime");
+    }
   }
 }
 
