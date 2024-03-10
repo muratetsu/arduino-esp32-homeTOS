@@ -48,9 +48,22 @@ void onLocalEvent(uint16_t state)
 
   if (state & STATE_DAYTIME) {
     Serial.print("Daytime - ");
+    ledCtrlSetStreetLight(0);
+    ledCtrlSetEntranceLight(0);
+    ledCtrlSetRoomLight(0);
   }
   else {
     Serial.print("Nighttime - ");
+    ledCtrlSetStreetLight(255);
+    
+    if (state & STATE_BRIGHT) {
+      ledCtrlSetEntranceLight(255);
+      ledCtrlSetRoomLight(255);
+    }
+    else {
+      ledCtrlSetEntranceLight(0);
+      ledCtrlSetRoomLight(0);
+    }
   }
 
   if (state & STATE_BRIGHT) {
@@ -150,6 +163,6 @@ void printLocalTime()
 
   t = time(NULL);
   tm = localtime(&t);
-  sprintf(str, "[time localtime] %04d/%02d/%02d %02d:%02d:%02d", tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
+  sprintf(str, "[localtime] %04d/%02d/%02d %02d:%02d:%02d", tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
   Serial.println(str);
 }
