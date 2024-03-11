@@ -6,7 +6,7 @@
 #define LED_CONTROL_H
 
 typedef struct {
-  uint16_t dulation;
+  uint16_t duration;
   uint16_t hue;
   uint8_t sat;
   uint8_t val;

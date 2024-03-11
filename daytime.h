@@ -1,4 +1,4 @@
-// Day time
+// Daytime
 //
 // March 10, 2024
 // Tetsu Nishimura

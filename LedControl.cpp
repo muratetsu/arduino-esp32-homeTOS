@@ -28,9 +28,9 @@ void ledTimerHandler(void)
   static uint8_t valPixel = 0;
   static led_val_t val = {0};
 
-  // Ditital LED Control
-  if (pixelState.dulation > 0) {
-    pixelState.dulation--;
+  // Digital LED Control
+  if (pixelState.duration > 0) {
+    pixelState.duration--;
     if (valPixel < pixelState.val) {
       valPixel++;
       pixels.setPixelColor(0, pixels.ColorHSV(pixelState.hue, pixelState.sat, valPixel));
@@ -87,7 +87,7 @@ void ledCtrlInit(void)
 
 void ledCtrlSetPixel(pixel_state_t px)
 {
-  pixelState.dulation = px.dulation / LED_TIMER_INTERVAL;
+  pixelState.duration = px.duration / LED_TIMER_INTERVAL;
   pixelState.hue      = px.hue;
   pixelState.sat      = px.sat;
   pixelState.val      = px.val;  
@@ -95,7 +95,7 @@ void ledCtrlSetPixel(pixel_state_t px)
 
 void ledCtrlSetPixelRed(void)
 {
-  pixelState.dulation = 0xffff;
+  pixelState.duration = 0xffff;
   pixelState.hue = 0;
   pixelState.sat = 255;
   pixelState.val = 128;
@@ -103,7 +103,7 @@ void ledCtrlSetPixelRed(void)
 
 void ledCtrlSetPixelOff(void)
 {
-  pixelState.dulation = 0;
+  pixelState.duration = 0;
 }
 
 void ledCtrlSetStreetLight(uint8_t val)

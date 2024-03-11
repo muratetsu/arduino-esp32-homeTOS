@@ -34,7 +34,7 @@ void onRemoteEvent(const String& msg)
 
     msg.getBytes((unsigned char*)buf, sizeof(buf));
     val = strtoll(&buf[4], NULL, 16);
-    px.dulation = (val >> 32) & 0xffff;
+    px.duration = (val >> 32) & 0xffff;
     px.hue      = (val >> 16) & 0xffff;
     px.sat      = (val >>  8) & 0xff;
     px.val      =  val        & 0xff;
@@ -49,18 +49,22 @@ void onLocalEvent(uint16_t state)
   if (state & STATE_DAYTIME) {
     Serial.print("Daytime - ");
     ledCtrlSetStreetLight(0);
+      // TODO: 以下の2つはRemote側への状態通知に置き換える
     ledCtrlSetEntranceLight(0);
     ledCtrlSetRoomLight(0);
   }
   else {
     Serial.print("Nighttime - ");
-    ledCtrlSetStreetLight(255);
-    
+
     if (state & STATE_BRIGHT) {
+      ledCtrlSetStreetLight(255);
+      // TODO: 以下の2つはRemote側への状態通知に置き換える
       ledCtrlSetEntranceLight(255);
       ledCtrlSetRoomLight(255);
     }
     else {
+      ledCtrlSetStreetLight(16);
+      // TODO: 以下の2つはRemote側への状態通知に置き換える
       ledCtrlSetEntranceLight(0);
       ledCtrlSetRoomLight(0);
     }
@@ -104,7 +108,7 @@ void loop()
 
   if (swState) {
     swState = false;
-    pixelState.dulation = 2000;
+    pixelState.duration = 2000;
     pixelState.hue = random(65536);
     pixelState.sat = 128 + random(128);
     pixelState.val = 128;
@@ -142,7 +146,7 @@ void swLongPushHandler(void)
 
   // Let user know that SSID is erased
   // TODO: 高速点滅など分かりやすいです表示に変えること
-  pixelState.dulation = 2000;
+  pixelState.duration = 2000;
   pixelState.hue = 0;
   pixelState.sat = 255;
   pixelState.val = 128;
@@ -152,7 +156,7 @@ void swLongPushHandler(void)
 void pixelEncode(char* buf, pixel_state_t px)
 {
     sprintf(buf, "BTN:%04X%04X%02X%02X",
-      px.dulation, px.hue, px.sat, px.val);
+      px.duration, px.hue, px.sat, px.val);
 }
 
 void printLocalTime()

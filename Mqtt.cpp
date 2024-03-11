@@ -1,4 +1,4 @@
-// Network (WLAN and MQTT)
+// MQTT
 //
 // March 3, 2024
 // Tetsu Nishimura
@@ -9,7 +9,7 @@
 #include "Mqtt.h"
 #include "LedControl.h"
 
-#define JST                     (3600 * 9)
+#define JST       (3600 * 9)
 
 // Function prototype
 bool wifiIsSsidStored(void);

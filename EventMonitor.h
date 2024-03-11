@@ -8,7 +8,7 @@
 #define STATE_BRIGHT  0x0001
 #define STATE_DAYTIME 0x0002
 
-typedef void(* stateChangedCallback)(uint16_t state);
+typedef void(*stateChangedCallback)(uint16_t state);
 
 void eventMonitorInit(stateChangedCallback cb);
 

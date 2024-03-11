@@ -1,4 +1,4 @@
-// Day time
+// Daytime
 //
 // March 10, 2024
 // Tetsu Nishimura
@@ -9,7 +9,7 @@
 
 typedef struct {
   uint16_t sunrise; // The time of sunrise in minutes
-  uint16_t sunset;  // The time of sunset in ninutes
+  uint16_t sunset;  // The time of sunset in minutes
 } daytime_t;
 
 // Annual Daytime at Osaka, Japan
