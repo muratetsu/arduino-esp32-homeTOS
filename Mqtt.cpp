@@ -138,9 +138,11 @@ void mqttInit(MessageReceivedCallback callback)
   generateTopic(topicRemoteEvent, remote_id.c_str(), "event");
 
 
-  if (CONFIGURATION.debug)
+  if (CONFIGURATION.debug) {
     client.enableDebuggingMessages();
-
+  }
+  client.enableHTTPWebUpdater();
+  client.enableOTA();
   client.setWifiCredentials(CONFIGURATION.ssid, CONFIGURATION.password);
   client.setMqttClientName(CONFIGURATION.nodename);
   client.setMqttServer(CONFIGURATION.mqttbroker, CONFIGURATION.mqttuser, CONFIGURATION.mqttpass, CONFIGURATION.mqttport);
