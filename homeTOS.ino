@@ -25,7 +25,7 @@ Ticker swTicker;
 
 void onRemoteEvent(const String& msg)
 {
-  Serial.println("Remote event received");
+  printLog("Remote event received");
 
   if (msg.startsWith("BTN:")) {
     char buf[20] = {0};
@@ -44,17 +44,17 @@ void onRemoteEvent(const String& msg)
 
 void onLocalEvent(uint16_t state)
 {
-  printLocalTime();
+  String msg;
 
   if (state & STATE_DAYTIME) {
-    Serial.print("Daytime - ");
+    msg = "Daytime - ";
     ledCtrlSetStreetLight(0);
       // TODO: 以下の2つはRemote側への状態通知に置き換える
     ledCtrlSetEntranceLight(0);
     ledCtrlSetRoomLight(0);
   }
   else {
-    Serial.print("Nighttime - ");
+    msg = "Nighttime - ";
 
     if (state & STATE_BRIGHT) {
       ledCtrlSetStreetLight(255);
@@ -71,11 +71,13 @@ void onLocalEvent(uint16_t state)
   }
 
   if (state & STATE_BRIGHT) {
-    Serial.println("Bright");
+    msg += "Bright";
   }
   else {
-    Serial.println("Dark");
+    msg += "Dark";
   }
+
+  printLog(msg.c_str());
 }
 
 //*******************************************************
@@ -116,9 +118,7 @@ void loop()
 
     pixelEncode(buf, pixelState);
     mqttPublishEvent(buf);
-    Serial.println(buf);
-
-    printLocalTime();
+    printLog(buf);
   }
 }
 
@@ -140,7 +140,7 @@ void ARDUINO_ISR_ATTR swHandler(void)
 void swLongPushHandler(void)
 {
   swLongPushed = true;
-  Serial.println("Erase SSID");
+  printLog("Erase SSID");
 
   mqttWifiClearSetting();
 
@@ -159,7 +159,7 @@ void pixelEncode(char* buf, pixel_state_t px)
       px.duration, px.hue, px.sat, px.val);
 }
 
-void printLocalTime()
+void printLog(const char* msg)
 {
   time_t t;
   struct tm *tm;
@@ -167,6 +167,6 @@ void printLocalTime()
 
   t = time(NULL);
   tm = localtime(&t);
-  sprintf(str, "[localtime] %04d/%02d/%02d %02d:%02d:%02d", tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
+  sprintf(str, "%04d/%02d/%02d %02d:%02d:%02d %s", tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec, msg);
   Serial.println(str);
 }
