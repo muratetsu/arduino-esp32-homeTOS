@@ -40,6 +40,15 @@ void onRemoteEvent(const String& msg)
     px.val      =  val        & 0xff;
     ledCtrlSetPixel(px);
   }
+  else if (msg.startsWith("LED:")) {
+    char buf[20] = {0};
+    long val;
+
+    msg.getBytes((unsigned char*)buf, sizeof(buf));
+    val = strtol(&buf[4], NULL, 16);
+    ledCtrlSetEntranceLight((val >> 8) & 0xff);
+    ledCtrlSetRoomLight(val & 0xff);
+  }
 }
 
 void onLocalEvent(uint16_t state)
@@ -49,24 +58,21 @@ void onLocalEvent(uint16_t state)
   if (state & STATE_DAYTIME) {
     msg = "Daytime - ";
     ledCtrlSetStreetLight(0);
-      // TODO: 以下の2つはRemote側への状態通知に置き換える
-    ledCtrlSetEntranceLight(0);
-    ledCtrlSetRoomLight(0);
+    // Remote側へ状態通知
+    mqttPublishEvent("LED:0000");
   }
   else {
     msg = "Nighttime - ";
 
     if (state & STATE_BRIGHT) {
       ledCtrlSetStreetLight(255);
-      // TODO: 以下の2つはRemote側への状態通知に置き換える
-      ledCtrlSetEntranceLight(255);
-      ledCtrlSetRoomLight(255);
+      // Remote側へ状態通知
+      mqttPublishEvent("LED:FFFF");
     }
     else {
       ledCtrlSetStreetLight(16);
-      // TODO: 以下の2つはRemote側への状態通知に置き換える
-      ledCtrlSetEntranceLight(0);
-      ledCtrlSetRoomLight(0);
+      // Remote側へ状態通知
+      mqttPublishEvent("LED:1000");
     }
   }
 
