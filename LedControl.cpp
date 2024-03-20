@@ -93,17 +93,12 @@ void ledCtrlSetPixel(pixel_state_t px)
   pixelState.val      = px.val;  
 }
 
-void ledCtrlSetPixelRed(void)
+void ledCtrlSetPixelHue(uint16_t hue, uint16_t duration)
 {
-  pixelState.duration = 0xffff;
-  pixelState.hue = 0;
+  pixelState.duration = duration / LED_TIMER_INTERVAL;
+  pixelState.hue = hue;
   pixelState.sat = 255;
-  pixelState.val = 128;
-}
-
-void ledCtrlSetPixelOff(void)
-{
-  pixelState.duration = 0;
+  pixelState.val = 255;
 }
 
 void ledCtrlSetStreetLight(uint8_t val)

@@ -5,6 +5,10 @@
 #ifndef LED_CONTROL_H
 #define LED_CONTROL_H
 
+#define HUE_RED           0x0000
+#define HUE_GREEN         0x5555
+#define HUE_BLUE          0xAAAA
+
 typedef struct {
   uint16_t duration;
   uint16_t hue;
@@ -20,8 +24,7 @@ typedef struct {
 
 void ledCtrlInit(void);
 void ledCtrlSetPixel(pixel_state_t px);
-void ledCtrlSetPixelRed(void);
-void ledCtrlSetPixelOff(void);
+void ledCtrlSetPixelHue(uint16_t hue, uint16_t duration);
 void ledCtrlSetStreetLight(uint8_t val);
 void ledCtrlSetEntranceLight(uint8_t val);
 void ledCtrlSetRoomLight(uint8_t val);

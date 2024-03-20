@@ -115,6 +115,8 @@ void mqttInit(MessageReceivedCallback callback)
 {
   remoteEventCallback = callback;
 
+  ledCtrlSetPixelHue(HUE_RED, 0xffff);
+
   prefs.begin("wi-fi", true);
   prefs.getBytes("sta.ssid", CONFIGURATION.ssid, sizeof(CONFIGURATION.ssid));
   prefs.getBytes("sta.pswd", CONFIGURATION.password, sizeof(CONFIGURATION.password));
@@ -170,8 +172,8 @@ void onConnectionEstablished()
   // Get time from NTP server
   configTime( JST, 0, "ntp.nict.jp", "time.google.com", "ntp.jst.mfeed.ad.jp");
   
-  // Turn off Digital LED
-  ledCtrlSetPixelOff();
+  // Turn the Digital LED green then off
+  ledCtrlSetPixelHue(HUE_GREEN, 0);
 }
 
 void onHostConfig(const String& msg)

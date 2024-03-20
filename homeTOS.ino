@@ -95,7 +95,6 @@ void setup()
   Serial.begin(115200);
 
   ledCtrlInit();
-  ledCtrlSetPixelRed();
   ledCtrlSetStreetLight(255);
   ledCtrlSetEntranceLight(255);
   ledCtrlSetRoomLight(255);
