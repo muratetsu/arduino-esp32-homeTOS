@@ -12,5 +12,6 @@ void mqttWifiClearSetting(void);
 void mqttInit(MessageReceivedCallback callback);
 void mqttPublishEvent(const String &payload);
 void mqttLoop(void);
+bool isWifiConnected(void);
 
 #endif  // MQTT_H

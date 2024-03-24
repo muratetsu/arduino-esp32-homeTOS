@@ -143,8 +143,6 @@ void mqttInit(MessageReceivedCallback callback)
   if (CONFIGURATION.debug) {
     client.enableDebuggingMessages();
   }
-  client.enableHTTPWebUpdater();
-  client.enableOTA();
   client.setWifiCredentials(CONFIGURATION.ssid, CONFIGURATION.password);
   client.setMqttClientName(CONFIGURATION.nodename);
   client.setMqttServer(CONFIGURATION.mqttbroker, CONFIGURATION.mqttuser, CONFIGURATION.mqttpass, CONFIGURATION.mqttport);
@@ -236,3 +234,7 @@ void publishState(void)
   client.publish(topicState, msg.c_str());
 }
 
+bool isWifiConnected(void)
+{
+  return client.isWifiConnected();
+}
