@@ -31,10 +31,10 @@ void update_started() {
 void update_finished() {
   Serial.println("CALLBACK:  HTTP update process finished");
   // Firmware update finished. Set status flag to ST_CHECK_UPDATE
-  Serial.println("HTTP_UPDATE_OK");
   prefs.begin("firmware", false);
   prefs.putUShort("status", ST_CHECK_UPDATE);
   prefs.end();
+  // System reset occurs
 }
 
 void update_progress(int cur, int total) {
@@ -76,7 +76,7 @@ void updateFirmware(void)
       break;
 
     case HTTP_UPDATE_OK:
-      Serial.println("Firmware update completed");
+      Serial.println("HTTP_UPDATE_OK");
       break;
   }
 }
