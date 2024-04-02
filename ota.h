@@ -1,13 +1,13 @@
-// HTTP Update
+// OTA Firmware Update
 //
 // March 24, 2024
 // Tetsu Nishimura
-#ifndef HTTP_UPDATE_H
-#define HTTP_UPDATE_H
+#ifndef OTA_H
+#define OTA_H
 
 #define HASH_SIZE               32
 extern char firmwareHash[HASH_SIZE + 1];
 
-void httpUpdateInit(void);
+void otaInit(void);
 
-#endif  // HTTP_UPDATE_H
+#endif  // OTA_H

@@ -10,7 +10,7 @@
 #include "Mqtt.h"
 #include "LedControl.h"
 #include "EventMonitor.h"
-#include "HttpUpdate.h"
+#include "ota.h"
 
 #define PIN_SWITCH              D9
 #define SW_LONG_PUSH_DURATION   10 // sec
@@ -95,7 +95,7 @@ void setup()
   pinMode(PIN_SWITCH, INPUT);
   Serial.begin(115200);
 
-  httpUpdateInit();
+  otaInit();
 
   ledCtrlInit();
   ledCtrlSetStreetLight(255);

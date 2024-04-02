@@ -1,4 +1,4 @@
-// HTTP Update
+// OTA Firmware Update
 //
 // March 24, 2024
 // Tetsu Nishimura
@@ -9,7 +9,7 @@
 #include <Preferences.h>
 #include <Ticker.h>
 #include "Mqtt.h"
-#include "HttpUpdate.h"
+#include "ota.h"
 #include "serverInfo/serverInfo.h"
 
 #define UPDATE_CHECK_INTERVAL   (24 * 3600)   // 24 hours
@@ -130,7 +130,7 @@ void updateMonitorHandler(void)
   }
 }
 
-void httpUpdateInit(void)
+void otaInit(void)
 {
   uint16_t status;
 

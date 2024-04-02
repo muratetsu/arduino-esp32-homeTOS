@@ -8,7 +8,7 @@
 #include <time.h>
 #include "Mqtt.h"
 #include "LedControl.h"
-#include "HttpUpdate.h"
+#include "ota.h"
 
 #define JST       (3600 * 9)
 
