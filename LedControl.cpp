@@ -22,19 +22,20 @@
 
 Ticker ledTicker;
 Adafruit_NeoPixel pixels(NUM_PIXELS, PIN_PIXEL, NEO_GRB + NEO_KHZ800);
+static pixel_state_t pxNow;
 static pixel_state_t pxTarget;
+uint16_t pxDuration;
 led_val_t targetVal;
 
 void ledTimerHandler(void)
 {
-  static pixel_state_t pxNow = {0};
   static led_val_t val = {0};
   int32_t hueDiff;
   bool changed = false;
 
   // Digital LED Control
-  if (pxTarget.duration > 0) {
-    pxTarget.duration--;
+  if (pxDuration > 0) {
+    pxDuration--;
   }
   else {  // If the duration expired, set target val to zero
     pxTarget.val = 0;
@@ -110,20 +111,30 @@ void ledCtrlInit(void)
   ledTicker.attach_ms(LED_TIMER_INTERVAL, ledTimerHandler);
 }
 
-void ledCtrlSetPixel(pixel_state_t px)
+void ledCtrlSetPixel(pixel_state_t px, uint16_t duration)
 {
-  pxTarget.duration = px.duration / LED_TIMER_INTERVAL;
+  pxDuration = duration / LED_TIMER_INTERVAL;
   pxTarget.hue      = px.hue;
   pxTarget.sat      = px.sat;
   pxTarget.val      = px.val;
+
+  if (pxNow.val == 0) {
+    pxNow.hue = pxTarget.hue;
+    pxNow.sat = pxTarget.sat;
+  }
 }
 
 void ledCtrlSetPixelHue(uint16_t hue, uint16_t duration)
 {
-  pxTarget.duration = duration / LED_TIMER_INTERVAL;
+  pxDuration = duration / LED_TIMER_INTERVAL;
   pxTarget.hue = hue;
   pxTarget.sat = 255;
   pxTarget.val = 255;
+
+  if (pxNow.val == 0) {
+    pxNow.hue = pxTarget.hue;
+    pxNow.sat = pxTarget.sat;
+  }
 }
 
 void ledCtrlSetStreetLight(uint8_t val)

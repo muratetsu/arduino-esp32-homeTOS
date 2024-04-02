@@ -32,14 +32,15 @@ void onRemoteEvent(const String& msg)
     char buf[20] = {0};
     long long val;
     pixel_state_t px;
+    uint16_t duration;
 
     msg.getBytes((unsigned char*)buf, sizeof(buf));
     val = strtoll(&buf[4], NULL, 16);
-    px.duration = (val >> 32) & 0xffff;
-    px.hue      = (val >> 16) & 0xffff;
-    px.sat      = (val >>  8) & 0xff;
-    px.val      =  val        & 0xff;
-    ledCtrlSetPixel(px);
+    duration = (val >> 32) & 0xffff;
+    px.hue   = (val >> 16) & 0xffff;
+    px.sat   = (val >>  8) & 0xff;
+    px.val   =  val        & 0xff;
+    ledCtrlSetPixel(px, duration);
   }
   else if (msg.startsWith("LED:")) {
     char buf[20] = {0};
@@ -118,13 +119,13 @@ void loop()
 
   if (swState) {
     swState = false;
-    pixelState.duration = 2000;
+    uint16_t duration = 2000;
     pixelState.hue = random(65536);
     pixelState.sat = 128 + random(128);
     pixelState.val = 128;
-    ledCtrlSetPixel(pixelState);
+    ledCtrlSetPixel(pixelState, duration);
 
-    pixelEncode(buf, pixelState);
+    pixelEncode(buf, pixelState, duration);
     mqttPublishEvent(buf);
     printLog(buf);
   }
@@ -154,17 +155,16 @@ void swLongPushHandler(void)
 
   // Let user know that SSID is erased
   // TODO: 高速点滅など分かりやすいです表示に変えること
-  pixelState.duration = 2000;
   pixelState.hue = 0;
   pixelState.sat = 255;
   pixelState.val = 128;
-  ledCtrlSetPixel(pixelState);
+  ledCtrlSetPixel(pixelState, 2000);
 }
 
-void pixelEncode(char* buf, pixel_state_t px)
+void pixelEncode(char* buf, pixel_state_t px, uint16_t duration)
 {
     sprintf(buf, "BTN:%04X%04X%02X%02X",
-      px.duration, px.hue, px.sat, px.val);
+      duration, px.hue, px.sat, px.val);
 }
 
 void printLog(const char* msg)

@@ -10,7 +10,6 @@
 #define HUE_BLUE          0xAAAA
 
 typedef struct {
-  uint16_t duration;
   uint16_t hue;
   uint8_t sat;
   uint8_t val;
@@ -23,7 +22,7 @@ typedef struct {
 } led_val_t;
 
 void ledCtrlInit(void);
-void ledCtrlSetPixel(pixel_state_t px);
+void ledCtrlSetPixel(pixel_state_t px, uint16_t duration);
 void ledCtrlSetPixelHue(uint16_t hue, uint16_t duration);
 void ledCtrlSetStreetLight(uint8_t val);
 void ledCtrlSetEntranceLight(uint8_t val);
