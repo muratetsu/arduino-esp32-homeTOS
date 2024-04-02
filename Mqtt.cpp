@@ -8,6 +8,7 @@
 #include <time.h>
 #include "Mqtt.h"
 #include "LedControl.h"
+#include "HttpUpdate.h"
 
 #define JST       (3600 * 9)
 
@@ -229,7 +230,11 @@ void generateTopic(char* topic, const char* id, const char* func)
 
 void publishState(void)
 {
-  String msg = "Peer: " + remote_id;
+  String msg;
+  msg  = "Rev:";
+  msg += firmwareHash;
+  msg += ", ";
+  msg += "Peer:" + remote_id;
   
   client.publish(topicState, msg.c_str());
 }

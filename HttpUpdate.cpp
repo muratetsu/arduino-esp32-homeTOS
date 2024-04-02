@@ -13,7 +13,6 @@
 #include "serverInfo/serverInfo.h"
 
 #define UPDATE_CHECK_INTERVAL   (24 * 3600)   // 24 hours
-#define HASH_SIZE               32
 
 // Status flags
 #define ST_CHECK_UPDATE     0
@@ -22,7 +21,7 @@
 Ticker updateMonitorTicker;
 extern Preferences prefs;
 
-static char firmwareHash[HASH_SIZE];
+char firmwareHash[HASH_SIZE + 1];
 
 void update_started() {
   Serial.println("CALLBACK:  HTTP update process started");
@@ -115,14 +114,14 @@ void updateMonitorHandler(void)
     Serial.print("Local : ");
     Serial.println(firmwareHash);
     
-    if (memcmp(payload.c_str(), firmwareHash, sizeof(firmwareHash)) == 0) {
+    if (memcmp(payload.c_str(), firmwareHash, HASH_SIZE) == 0) {
       Serial.println("Firmware is up to date");
     }
     else {
       // Set status flag to ST_PUDATE_ONGOING and restart ESP32
       prefs.begin("firmware", false);
       prefs.putUShort("status", ST_PUDATE_ONGOING);
-      prefs.putBytes("hash", payload.c_str(), sizeof(firmwareHash));
+      prefs.putBytes("hash", payload.c_str(), HASH_SIZE);
       prefs.end();
 
       Serial.println("Restart");
@@ -137,7 +136,7 @@ void httpUpdateInit(void)
 
   prefs.begin("firmware", true);
   status  = prefs.getUShort("status");
-  prefs.getBytes("hash", firmwareHash, sizeof(firmwareHash));
+  prefs.getBytes("hash", firmwareHash, HASH_SIZE);
   prefs.end();
 
   if (status == ST_CHECK_UPDATE) {
