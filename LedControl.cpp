@@ -27,20 +27,13 @@ static pixel_state_t pxTarget;
 uint16_t pxDuration;
 led_val_t targetVal;
 
-void ledTimerHandler(void)
+void ledDimmHandler(void)
 {
   static led_val_t val = {0};
   int32_t hueDiff;
   bool changed = false;
 
   // Digital LED Control
-  if (pxDuration > 0) {
-    pxDuration--;
-  }
-  else {  // If the duration expired, set target val to zero
-    pxTarget.val = 0;
-  }
-
   hueDiff = ((pxTarget.hue - pxNow.hue + 0x8000L) & 0xffff) - 0x8000L;
   if (hueDiff > HUE_STEP) {
     pxNow.hue += HUE_STEP;
@@ -55,7 +48,7 @@ void ledTimerHandler(void)
     pxNow.sat++;
     changed = true;
   }
-  else if (pxNow.sat > pxTarget.val) {
+  else if (pxNow.sat > pxTarget.sat) {
     pxNow.sat--;
     changed = true;
   }
@@ -108,12 +101,11 @@ void ledCtrlInit(void)
   analogWrite(PIN_ENTRANCE_LIGHT, 128);
   analogWrite(PIN_ROOM_LIGHT, 128);
 
-  ledTicker.attach_ms(LED_TIMER_INTERVAL, ledTimerHandler);
+  ledTicker.attach_ms(LED_TIMER_INTERVAL, ledDimmHandler);
 }
 
-void ledCtrlSetPixel(pixel_state_t px, uint16_t duration)
+void ledCtrlSetPixel(pixel_state_t px)
 {
-  pxDuration = duration / LED_TIMER_INTERVAL;
   pxTarget.hue      = px.hue;
   pxTarget.sat      = px.sat;
   pxTarget.val      = px.val;
@@ -124,9 +116,8 @@ void ledCtrlSetPixel(pixel_state_t px, uint16_t duration)
   }
 }
 
-void ledCtrlSetPixelHue(uint16_t hue, uint16_t duration)
+void ledCtrlSetPixelHue(uint16_t hue)
 {
-  pxDuration = duration / LED_TIMER_INTERVAL;
   pxTarget.hue = hue;
   pxTarget.sat = 255;
   pxTarget.val = 255;
@@ -135,6 +126,11 @@ void ledCtrlSetPixelHue(uint16_t hue, uint16_t duration)
     pxNow.hue = pxTarget.hue;
     pxNow.sat = pxTarget.sat;
   }
+}
+
+void ledCtrlPixelOff(void)
+{
+    pxTarget.val = 0;
 }
 
 void ledCtrlSetStreetLight(uint8_t val)

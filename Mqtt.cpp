@@ -7,7 +7,7 @@
 #include <Preferences.h>
 #include <time.h>
 #include "Mqtt.h"
-#include "LedControl.h"
+#include "LedSequencer.h"
 #include "ota.h"
 
 #define JST       (3600 * 9)
@@ -116,7 +116,7 @@ void mqttInit(MessageReceivedCallback callback)
 {
   remoteEventCallback = callback;
 
-  ledCtrlSetPixelHue(HUE_RED, 0xffff);
+  ledSeqSetPixelHue(HUE_RED, 0xffff);
 
   prefs.begin("wi-fi", true);
   prefs.getBytes("sta.ssid", CONFIGURATION.ssid, sizeof(CONFIGURATION.ssid));
@@ -172,7 +172,7 @@ void onConnectionEstablished()
   configTime( JST, 0, "ntp.nict.jp", "time.google.com", "ntp.jst.mfeed.ad.jp");
   
   // Turn the Digital LED green then off
-  ledCtrlSetPixelHue(HUE_GREEN, 0);
+  ledSeqSetPixelHue(HUE_GREEN, 0);
 }
 
 void onHostConfig(const String& msg)

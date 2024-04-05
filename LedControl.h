@@ -22,8 +22,9 @@ typedef struct {
 } led_val_t;
 
 void ledCtrlInit(void);
-void ledCtrlSetPixel(pixel_state_t px, uint16_t duration);
-void ledCtrlSetPixelHue(uint16_t hue, uint16_t duration);
+void ledCtrlSetPixel(pixel_state_t px);
+void ledCtrlSetPixelHue(uint16_t hue);
+void ledCtrlPixelOff(void);
 void ledCtrlSetStreetLight(uint8_t val);
 void ledCtrlSetEntranceLight(uint8_t val);
 void ledCtrlSetRoomLight(uint8_t val);

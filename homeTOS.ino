@@ -8,6 +8,7 @@
 #include <Ticker.h>
 #include <time.h>
 #include "Mqtt.h"
+#include "LedSequencer.h"
 #include "LedControl.h"
 #include "EventMonitor.h"
 #include "ota.h"
@@ -28,7 +29,7 @@ void onRemoteEvent(const String& msg)
 {
   printLog("Remote event received");
 
-  if (msg.startsWith("BTN:")) {
+  if (msg.startsWith("BTN:") && msg.length() == 16) {
     char buf[20] = {0};
     long long val;
     pixel_state_t px;
@@ -40,16 +41,15 @@ void onRemoteEvent(const String& msg)
     px.hue   = (val >> 16) & 0xffff;
     px.sat   = (val >>  8) & 0xff;
     px.val   =  val        & 0xff;
-    ledCtrlSetPixel(px, duration);
+    ledSeqSetPixel(px, duration);
   }
-  else if (msg.startsWith("LED:")) {
-    char buf[20] = {0};
-    long val;
-
-    msg.getBytes((unsigned char*)buf, sizeof(buf));
-    val = strtol(&buf[4], NULL, 16);
-    ledCtrlSetEntranceLight((val >> 8) & 0xff);
-    ledCtrlSetRoomLight(val & 0xff);
+  else if (msg == "LUM:0") {
+    ledCtrlSetEntranceLight(0);
+    ledCtrlSetRoomLight(0);
+  }
+  else if (msg == "LUM:1") {
+    ledCtrlSetEntranceLight(255);
+    ledCtrlSetRoomLight(255);
   }
 }
 
@@ -61,7 +61,7 @@ void onLocalEvent(uint16_t state)
     msg = "Daytime - ";
     ledCtrlSetStreetLight(0);
     // Remote側へ状態通知
-    mqttPublishEvent("LED:0000");
+    mqttPublishEvent("LUM:0");
   }
   else {
     msg = "Nighttime - ";
@@ -69,12 +69,12 @@ void onLocalEvent(uint16_t state)
     if (state & STATE_BRIGHT) {
       ledCtrlSetStreetLight(255);
       // Remote側へ状態通知
-      mqttPublishEvent("LED:FFFF");
+      mqttPublishEvent("LUM:1");
     }
     else {
       ledCtrlSetStreetLight(16);
       // Remote側へ状態通知
-      mqttPublishEvent("LED:1000");
+      mqttPublishEvent("LUM:0");
     }
   }
 
@@ -119,11 +119,11 @@ void loop()
 
   if (swState) {
     swState = false;
-    uint16_t duration = 2000;
+    uint16_t duration = 4000;
     pixelState.hue = random(65536);
     pixelState.sat = 128 + random(128);
     pixelState.val = 128;
-    ledCtrlSetPixel(pixelState, duration);
+    ledSeqSetPixel(pixelState, duration);
 
     pixelEncode(buf, pixelState, duration);
     mqttPublishEvent(buf);
@@ -158,7 +158,7 @@ void swLongPushHandler(void)
   pixelState.hue = 0;
   pixelState.sat = 255;
   pixelState.val = 128;
-  ledCtrlSetPixel(pixelState, 2000);
+  ledSeqSetPixel(pixelState, 2000);
 }
 
 void pixelEncode(char* buf, pixel_state_t px, uint16_t duration)
