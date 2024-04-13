@@ -15,12 +15,14 @@
 
 #define PIN_SWITCH              D9
 #define SW_LONG_PUSH_DURATION   10 // sec
+#define DEBUG_REPORT_INTERVAL   3600  // sec
 
 static pixel_state_t pixelState;
 
 volatile bool swState;
 volatile bool swLongPushed;
 Ticker swTicker;
+Ticker debugReportTicker;
 
 //*******************************************************
 // Event Handling
@@ -88,6 +90,16 @@ void onLocalEvent(uint16_t state)
   printLog(msg.c_str());
 }
 
+void debugReportHandler(void)
+{
+  eventState_t state;
+  char str[256];
+
+  eventMonitorGetStatus(&state);
+  sprintf(str, "Brightness: %d, %d", state.min, state.max);
+  mqttPublishState(str);
+}
+
 //*******************************************************
 // Arduino setup and loop
 
@@ -109,6 +121,7 @@ void setup()
   mqttInit(onRemoteEvent);
 
   eventMonitorInit(onLocalEvent);
+  debugReportTicker.attach(DEBUG_REPORT_INTERVAL, debugReportHandler);
 }
 
 void loop()

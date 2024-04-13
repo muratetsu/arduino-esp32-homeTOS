@@ -10,6 +10,12 @@
 
 typedef void(*stateChangedCallback)(uint16_t state);
 
+typedef struct {
+  uint16_t min;
+  uint16_t max;
+} eventState_t;
+
 void eventMonitorInit(stateChangedCallback cb);
+void eventMonitorGetStatus(eventState_t* state);
 
 #endif  // EVENT_MONITOR_H

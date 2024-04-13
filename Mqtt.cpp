@@ -243,3 +243,8 @@ bool isWifiConnected(void)
 {
   return client.isWifiConnected();
 }
+
+void mqttPublishState(const char* msg)
+{
+  client.publish(topicState, msg);
+}
