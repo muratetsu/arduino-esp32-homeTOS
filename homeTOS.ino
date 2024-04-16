@@ -8,8 +8,8 @@
 #include <Ticker.h>
 #include <time.h>
 #include "Mqtt.h"
-#include "LedSequencer.h"
 #include "LedControl.h"
+#include "LedSequencer.h"
 #include "EventMonitor.h"
 #include "ota.h"
 
@@ -45,46 +45,40 @@ void onRemoteEvent(const String& msg)
     px.val   =  val        & 0xff;
     ledSeqSetPixel(px, duration);
   }
-  else if (msg == "LUM:0") {
-    ledCtrlSetEntranceLight(0);
-    ledCtrlSetRoomLight(0);
-  }
-  else if (msg == "LUM:1") {
-    ledCtrlSetEntranceLight(255);
-    ledCtrlSetRoomLight(255);
+  else if (msg.startsWith("STA:") && msg.length() == 5) {
+    uint8_t state = msg.charAt(4) - '0';
+
+    if (state & STATE_BRIGHT) {
+      if (state & STATE_DAYTIME) {
+        ledSeqSetLights(0);
+      }
+      else {
+        ledSeqSetLights(255);
+      }
+    }
+    else {
+      ledSeqSetLights(8);
+    }
   }
 }
 
 void onLocalEvent(uint16_t state)
 {
-  String msg;
-
-  if (state & STATE_DAYTIME) {
-    msg = "Daytime - ";
-    ledCtrlSetStreetLight(0);
-    // Remote側へ状態通知
-    mqttPublishEvent("LUM:0");
-  }
-  else {
-    msg = "Nighttime - ";
-
-    if (state & STATE_BRIGHT) {
-      ledCtrlSetStreetLight(255);
-      // Remote側へ状態通知
-      mqttPublishEvent("LUM:1");
-    }
-    else {
-      ledCtrlSetStreetLight(16);
-      // Remote側へ状態通知
-      mqttPublishEvent("LUM:0");
-    }
-  }
+  // Remote側へ状態通知
+  String msg = "STA:";
+  msg += String(state);
+  mqttPublishEvent(msg.c_str());
 
   if (state & STATE_BRIGHT) {
-    msg += "Bright";
+    if (state & STATE_DAYTIME) {
+      ledCtrlSetStreetLight(0);
+    }
+    else {
+      ledCtrlSetStreetLight(255);
+    }
   }
   else {
-    msg += "Dark";
+    ledCtrlSetStreetLight(8);
   }
 
   printLog(msg.c_str());
@@ -111,9 +105,7 @@ void setup()
   otaInit();
 
   ledCtrlInit();
-  ledCtrlSetStreetLight(255);
-  ledCtrlSetEntranceLight(255);
-  ledCtrlSetRoomLight(255);
+  ledSeqSetLights(255);
 
   attachInterrupt(PIN_SWITCH, swHandler, CHANGE);
 

@@ -97,9 +97,9 @@ void ledCtrlInit(void)
   pinMode(PIN_ENTRANCE_LIGHT, OUTPUT);
   pinMode(PIN_ROOM_LIGHT, OUTPUT);
 
-  analogWrite(PIN_STREET_LIGHT, 128);
-  analogWrite(PIN_ENTRANCE_LIGHT, 128);
-  analogWrite(PIN_ROOM_LIGHT, 128);
+  analogWrite(PIN_STREET_LIGHT, 0);
+  analogWrite(PIN_ENTRANCE_LIGHT, 0);
+  analogWrite(PIN_ROOM_LIGHT, 0);
 
   ledTicker.attach_ms(LED_TIMER_INTERVAL, ledDimmHandler);
 }
