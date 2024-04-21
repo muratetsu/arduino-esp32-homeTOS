@@ -2,6 +2,13 @@
 //
 // March 24, 2024
 // Tetsu Nishimura
+//
+//
+// Description
+// - Check new firmware every 24 hours.
+// - If a new firmware is found, set status to ST_PUDATE_ONGOING, then reboot.
+// - Download the new firmware and update it.
+// - Once firmware update finished, set status to ST_CHECK_UPDATE, then go back to normal operation.
 
 #include <Arduino.h>
 #include <HTTPClient.h>

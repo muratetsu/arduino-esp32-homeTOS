@@ -147,11 +147,12 @@ void mqttInit(MessageReceivedCallback callback)
   client.setWifiCredentials(CONFIGURATION.ssid, CONFIGURATION.password);
   client.setMqttClientName(CONFIGURATION.nodename);
   client.setMqttServer(CONFIGURATION.mqttbroker, CONFIGURATION.mqttuser, CONFIGURATION.mqttpass, CONFIGURATION.mqttport);
+  client.setKeepAlive(60); // Change the keep alive interval (15 seconds by default)
 }
 
 void mqttPublishEvent(const String &payload)
 {
-    client.publish(topicLocalEvent, payload);
+    client.publish(topicLocalEvent, payload, true); // Retain as published
 }
 
 void mqttLoop(void)

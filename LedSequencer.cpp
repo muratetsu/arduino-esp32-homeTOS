@@ -8,7 +8,7 @@
 #include "LedSequencer.h"
 
 // Duration between first light control and second light control
-#define LIGHT_CTRL_DURATION 2000
+#define LIGHT_CTRL_DURATION 4000
 
 Ticker pixelTicker;
 Ticker lightTicker;

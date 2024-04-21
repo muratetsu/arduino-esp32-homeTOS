@@ -17,12 +17,12 @@ The project "Home The Other Side"
 | --- | --- | --- |
 | GPIO2 | D0/A0 | NC  |
 | GPIO3 | D1/A1 | Light Sensor |
-| GPIO4 | D2/A2 | LED |
-| GPIO5 | D3/A3 | LED |
-| GPIO6 | D4  | LED |
-| GPIO7 | D5  | LED |
+| GPIO4 | D2/A2 | LED(Street Light) |
+| GPIO5 | D3/A3 | LED(Entrance Light) |
+| GPIO6 | D4  | LED(Room Light) |
+| GPIO7 | D5  | LED(Optional) |
 | GPIO21 | D6  | NC  |
-| GPIO20 | D7  | LED |
+| GPIO20 | D7  | LED(Optional) |
 | GPIO8 | D8  | NC  |
 | GPIO9 | D9  | Switch Input |
 | GPIO10 | D10 | Full Color Digital LED |
