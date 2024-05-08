@@ -20,7 +20,6 @@
 static pixel_state_t pixelState;
 
 volatile bool swState;
-volatile bool swLongPushed;
 Ticker swTicker;
 Ticker debugReportTicker;
 
@@ -140,30 +139,21 @@ void ARDUINO_ISR_ATTR swHandler(void)
 {
   if (digitalRead(PIN_SWITCH) == LOW) {
     swState = true;
-    swLongPushed = false;
     swTicker.attach(SW_LONG_PUSH_DURATION, swLongPushHandler);
   }
   else {
     swTicker.detach();
-    if (swLongPushed) {
-      ESP.restart();
-    }
   }
 }
 
 void swLongPushHandler(void)
 {
-  swLongPushed = true;
   printLog("Erase SSID");
-
   mqttWifiClearSetting();
 
   // Let user know that SSID is erased
-  // TODO: 高速点滅など分かりやすいです表示に変えること
-  pixelState.hue = 0;
-  pixelState.sat = 255;
-  pixelState.val = 128;
-  ledSeqSetPixel(pixelState, 2000);
+  ledSeqSetPixelHue(HUE_RED, 0xffff);
+  ESP.restart();
 }
 
 void pixelEncode(char* buf, pixel_state_t px, uint16_t duration)

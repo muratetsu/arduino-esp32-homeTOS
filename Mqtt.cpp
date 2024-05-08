@@ -62,6 +62,7 @@ bool mqttWifiSetup(void)
   
   if (!wifiIsSsidStored()) {
     Serial.println("No SSID stored");
+    ledSeqBlinkPixel(HUE_RED, 2000, 0xffff);
     //Init WiFi as Station, start SmartConfig
     WiFi.mode(WIFI_AP_STA);
     WiFi.beginSmartConfig();
